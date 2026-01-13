@@ -33,6 +33,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 export const AVAILABLE_MODELS = [
+    "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-1.5-flash-8b",
     "gemini-1.5-pro",
@@ -45,7 +46,7 @@ const formSchema = z.object({
         .string()
         .min(1, { message: "Variable name is required" })
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and container only letters, numbers, and underscores", }),
-    model: z.enum(AVAILABLE_MODELS),
+    model: z.string().min(1, "Model is required"),
     systemPrompt: z.string().optional(),
     userPrompt: z.string().min(1, "User prompt is required"),
 });
