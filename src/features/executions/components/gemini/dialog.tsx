@@ -18,13 +18,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,21 +25,11 @@ import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
-export const AVAILABLE_MODELS = [
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-8b",
-    "gemini-1.5-pro",
-    "gemini-1.0-pro",
-    "gemini-pro",
-] as const;
-
 const formSchema = z.object({
     variableName: z
         .string()
         .min(1, { message: "Variable name is required" })
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and container only letters, numbers, and underscores", }),
-    model: z.string().min(1, "Model is required"),
     systemPrompt: z.string().optional(),
     userPrompt: z.string().min(1, "User prompt is required"),
 });
@@ -70,7 +53,6 @@ export const GeminiDialog = ({
         resolver: zodResolver(formSchema),
         defaultValues: {
             variableName: defaultValues.variableName || "",
-            model: defaultValues.model || AVAILABLE_MODELS[0],
             systemPrompt: defaultValues.systemPrompt || "",
             userPrompt: defaultValues.userPrompt || "",
         },
@@ -81,14 +63,13 @@ export const GeminiDialog = ({
         if (open) {
             form.reset({
                 variableName: defaultValues.variableName || "",
-                model: defaultValues.model || AVAILABLE_MODELS[0],
                 systemPrompt: defaultValues.systemPrompt || "",
                 userPrompt: defaultValues.userPrompt || "",
             });
         }
     }, [open, defaultValues, form]);
 
-    const watchVariableName = form.watch("variableName") || "myApiCall";
+    const watchVariableName = form.watch("variableName") || "myGemini";
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
         onSubmit(values);
@@ -117,43 +98,13 @@ export const GeminiDialog = ({
                                     <FormLabel>Variable Name</FormLabel>
                                     <FormControl>
                                        <Input 
-                                            placeholder="myApiCall"
+                                            placeholder="myGemini"
                                             {...field}
                                        /> 
                                     </FormControl>
                                     <FormDescription>
                                         Use this name to reference the result in other nodes:{" "}
                                         {`{{${watchVariableName}.text}}`}
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField 
-                            control={form.control}
-                            name="model"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Model</FormLabel>
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select a model" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {AVAILABLE_MODELS.map((model) => (
-                                                <SelectItem key={model} value={model}>
-                                                    {model}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription>
-                                        The Google Gemini model to use for completion
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
