@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nodebase
 
-## Getting Started
+**A visual workflow automation platform. Build workflows by connecting nodes on a canvas, then run them in the background with live status.**
 
-First, run the development server:
+## Overview
+
+Nodebase lets users design automations visually. Each workflow is a graph of nodes on a drag-and-drop canvas. When a workflow runs, Nodebase works out the order of the nodes from their connections, executes them as durable background jobs, and streams progress back to the editor in real time. Nodes can call external APIs and AI models, and data flows from one node to the next through templated variables.
+
+## Features
+
+- **Visual workflow editor:** build workflows by dragging nodes onto a canvas and connecting them, using React Flow.
+- **Dependency-ordered execution:** nodes run in the correct order, resolved with a topological sort of the workflow graph.
+- **Background execution:** runs are handled by Inngest, so they are durable and retry-friendly rather than tied to a web request.
+- **Realtime status:** execution progress is streamed back to the UI as the workflow runs.
+- **AI nodes:** call Google Gemini models through the Vercel AI SDK.
+- **Templated data passing:** reference the output of earlier nodes in later ones with Handlebars templates.
+- **Authentication:** sign-up and sign-in with Better Auth.
+- **Subscriptions:** paid plans handled through Polar.
+- **Error monitoring:** Sentry for server, edge and client errors.
+
+## Tech stack
+
+| Layer | Tools |
+|---|---|
+| Framework | Next.js 15 (App Router, Turbopack), React 19, TypeScript |
+| UI | Tailwind CSS 4, shadcn/ui, Radix UI, Lucide icons |
+| Workflow canvas | React Flow (`@xyflow/react`), Jotai |
+| API | tRPC, TanStack Query, Zod, superjson |
+| Database | PostgreSQL, Prisma ORM |
+| Background jobs | Inngest (with realtime updates) |
+| AI | Vercel AI SDK, Google Gemini |
+| Auth and billing | Better Auth, Polar |
+| Observability | Sentry |
+| Tooling | Biome (lint and format), mprocs |
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20 or later
+- A PostgreSQL database (a free [Neon](https://neon.tech) project works)
+- A [Google AI Studio](https://aistudio.google.com) API key for the Gemini nodes
+- Accounts for [Polar](https://polar.sh) and [Sentry](https://sentry.io) (optional while developing)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/anshulsharma1710/nodebase.git
+cd nodebase
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file in the project root:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+DATABASE_URL=
 
-## Learn More
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-To learn more about Next.js, take a look at the following resources:
+GOOGLE_GENERATIVE_AI_API_KEY=
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+POLAR_ACCESS_TOKEN=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+SENTRY_AUTH_TOKEN=
+```
 
-## Deploy on Vercel
+### Set up the database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Run locally
+
+Start the app and the Inngest dev server together:
+
+```bash
+npm run dev:all
+```
+
+This uses mprocs (see `mprocs.yaml`) to run both processes in one terminal. To run them separately:
+
+```bash
+npm run dev           # Next.js app on http://localhost:3000
+npm run inngest:dev   # Inngest dev server
+```
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the Next.js dev server with Turbopack |
+| `npm run dev:all` | Run the app and the Inngest dev server together with mprocs |
+| `npm run inngest:dev` | Start the Inngest dev server |
+| `npm run build` | Create a production build |
+| `npm run start` | Run the production build |
+| `npm run lint` | Lint with Biome |
+| `npm run format` | Format with Biome |
+
+<!-- If you built this by following a tutorial or course, credit it here, for example:
+## Credits
+Built while following [Course Name] by [Author]. -->
+
+## Author
+
+**Anshul Sharma**: Data Engineer and full-stack developer
+[LinkedIn](https://www.linkedin.com/in/anshulsharma02) · [GitHub](https://github.com/anshulsharma1710) · sanshul5555@gmail.com
